@@ -1,0 +1,31 @@
+export const APP_STORE_ERROR = 'APP_STORE_ERROR';
+export const REQUEST_FAILED = 'REQUEST_FAILED';
+
+
+export const CREATE_PROVIDER_REQUEST = 'CREATE_PROVIDER_REQUEST';
+export const CREATE_PROVIDER_REQUEST_SUCCESS = 'CREATE_PROVIDER_REQUEST_SUCCESS';
+
+export const FETCH_PROVIDER_REQUEST = 'FETCH_PROVIDER_REQUEST';
+export const FETCH_PROVIDER_REQUEST_SUCCESS = 'FETCH_PROVIDER_REQUEST_SUCCESS';
+
+export const CONFIRM_REQUEST = 'CONFIRM_REQUEST';
+export const CONFIRM_REQUEST_SUCCESS = 'CONFIRM_REQUEST_SUCCESS';
+
+export const ADD_REQUEST = 'ADD_REQUEST';
+export const REMOVE_REQUEST = 'REMOVE_REQUEST';
+
+
+export const API_SUFFIX = {
+    SUCCESS: '_SUCCESS',
+    IN_PROGRESS: '_IN_PROGRESS',
+    FAILURE: '_FAILURE'
+};
+
+export function appStoreError(error) {
+    return {
+        type: APP_STORE_ERROR,
+        payload: {
+            ...error
+        }
+    };
+}

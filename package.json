@@ -1,0 +1,32 @@
+{
+  "name": "node_learn",
+  "version": "1.0.0",
+  "description": "",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js",
+    "install-client": "cd client && npm i",
+    "build-client": "cd client && npm run build",
+    "run-client": "cd client && npm i && npm run build"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "cookie-parser": "^1.4.4",
+    "cors": "^2.8.5",
+    "express": "^4.17.1",
+    "express-handlebars": "^3.1.0",
+    "mongoose": "^5.8.9",
+    "path": "^0.12.7",
+    "dotenv": "^8.2.0",
+    "pug": "^2.0.4"
+  },
+  "devDependencies": {
+    "bcrypt": "^4.0.1",
+    "concurrently": "^5.1.0",
+    "dotenv": "^8.2.0",
+    "express-validator": "^6.4.0",
+    "nodemon": "^2.0.2"
+  }
+}
