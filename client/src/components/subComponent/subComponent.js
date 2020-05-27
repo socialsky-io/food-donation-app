@@ -44,10 +44,9 @@ class SubComponent extends React.Component {
 
 
     componentDidMount() {
-        // AIzaSyAgA67Hi7NMZ6g2Nhq1xXAxSEzS9dUKxOk
         const googleMapScript = document.createElement('script');
-        googleMapScript.src = 'https://maps.googleapis.com/maps/api/js?key=AIzaSyAgA67Hi7NMZ6g2Nhq1xXAxSEzS9dUKxOk&libraries=places';
-        // googleMapScript.src = `https://maps.googleapis.com/maps/api/js?key=AIzaSyAyesbQMyKVVbBgKVi2g6VX7mop2z96jBo&libraries=places`
+        googleMapScript.src = '';
+        // googleMapScript.src = ``
         window.document.body.appendChild(googleMapScript);
 
         googleMapScript.addEventListener('load', () => {
