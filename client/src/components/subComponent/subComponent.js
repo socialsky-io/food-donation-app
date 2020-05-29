@@ -4,11 +4,21 @@ import {Form, Button, Empty, Select, Input, DatePicker, InputNumber, Switch} fro
 import PropTypes from 'prop-types';
 import {bindAll, kebabCase} from 'lodash';
 import classnames from 'classnames';
+import moment from 'moment';
 
 import RequestTable from '../RequestTable';
 
 const Option = Select.Option;
 
+const timeSlots = {
+    LUNCH: '11am - 1pm',
+    SNACKS: '3pm - 6pm',
+    DINNER: '7pm - 9pm'
+};
+
+const mockOTP = {
+    '7588646483': '1234'
+};
 
 const countries = {
     'India': {
@@ -35,25 +45,24 @@ class SubComponent extends React.Component {
                 country: 'long_name',
                 postal_code: 'short_name'
             },
-            showProvider: false,
-            showHelpingHand: false
+            showScreen: '',
+            showHelpingHand: false,
+            searchMob: null
         };
-        bindAll(this, ['createProvider', 'checkIfErrors', 'geolocate', 'initAutocomplete', 'fetchProviders', 'confirmProvideRequest']);
+        bindAll(this, ['createProvider', 'checkIfErrors', 'geolocate', 'changeScreen', 'initAutocomplete', 'fetchProviders', 'getUsersRequest', 'confirmProvideRequest']);
         this.autocomplete = null;
     }
 
 
     componentDidMount() {
         const googleMapScript = document.createElement('script');
-        googleMapScript.src = '';
-        // googleMapScript.src = ``
         window.document.body.appendChild(googleMapScript);
-
-        googleMapScript.addEventListener('load', () => {
-            // this.googleMap = this.createGoogleMap()
-            // this.marker = this.createMarker()
-            this.initAutocomplete();
-        });
+        this.props.clearResponseMessage()
+        // googleMapScript.addEventListener('load', () => {
+        //     // this.googleMap = this.createGoogleMap()
+        //     // this.marker = this.createMarker()
+        //     this.initAutocomplete();
+        // });
     }
 
     initAutocomplete() {
@@ -105,31 +114,23 @@ class SubComponent extends React.Component {
     }
 
     createProvider() {
-        const errors = this.props.form.validateFields();
-        const errorInfo = this.props.form.getFieldsError();
+        const {form} = this.props;
+        let {autocomplete, componentForm, showProvider, showHelpingHand, ...rest} = this.state;
+    
+        const errors = form.validateFields();
+
+        // if(mockOTP[rest.mobileNo] != this.state.otp) {
+        //     form.setFields({['otp']: {value: this.state.otp, errors: [new Error('Invalid OTP')]}});
+        //     form.validateFields('otp');
+        //     return;
+        // }
+        const errorInfo = form.getFieldsError();
         if(this.checkIfErrors(errorInfo)) {
             return;
         }
-        const {auth} = this.props;
-        let {autocomplete, componentForm, showProvider, showHelpingHand, ...rest} = this.state;
 
-        rest.serveAs = rest.serveAs ? 'LUNCH' : 'DINNER';
         rest.serveOn = rest.serveOn._d.toDateString();
-        console.log('rest', rest);
-        // const {selectedCountry: '', selectedState: '', selectedCity: '', selectedArea: '',
-        // name, address, foodDesc, serves, serveOn, serveAs} = this.state;
-        // rest = {
-        //     selectedCountry: 'India',
-        //     selectedState: 'Maharashtra',
-        //     selectedCity: 'Pune',
-        //     selectedArea: 'Magarpatta',
-        //     name: 'Amol',
-        //     address: 'xyz',
-        //     foodDesc: 'khichadi',
-        //     serves: 10,
-        //     serveOn: '12/12/2020',
-        //     serveAs: 'Lunch'
-        // };
+        const {auth} = this.props;
         const data = {
             date: rest.serveOn,
             serves: rest.serves,
@@ -140,10 +141,18 @@ class SubComponent extends React.Component {
             areaName: rest.selectedArea,
             city: rest.selectedCity,
             state: rest.selectedState,
+            mobileNo: rest.mobileNo,
             country: rest.selectedCountry
         };
 
         this.props.createProvider(data);
+    }
+
+    getUsersRequest() {
+        const {searchMob} = this.state;
+        if(searchMob) {
+            this.props.getUserStatus({data: searchMob})
+        }
     }
 
     fetchProviders() {
@@ -158,6 +167,7 @@ class SubComponent extends React.Component {
     }
 
     confirmProvideRequest() {
+        const {auth} = this.props;
         this.props.confirmRequest({name: auth.user.username});
     }
 
@@ -165,10 +175,16 @@ class SubComponent extends React.Component {
         this.setState({[item]: val});
     }
 
+    changeScreen(screenName) {
+        this.props.clearResponseMessage();
+        this.setState({selectedCountry: '', selectedState: '', selectedCity: '', selectedArea: '', showScreen: screenName});
+        this.props.form.setFields({country: '', city: '', state: '', area: ''});
+    }
+
     render() {
-        const {allProviders = [], responseMessage, reqAdded= [], auth} = this.props;
+        const {allProviders = [], responseMessage, reqAdded= [], auth, userRequests = []} = this.props;
         const {getFieldDecorator} = this.props.form;
-        const {autocomplete = {}, componentForm, showProvider, showHelpingHand} = this.state;
+        const {autocomplete = {}, componentForm, showProvider, showHelpingHand, showScreen} = this.state;
         // const {ad = {}} = initData;
         const addressComps = autocomplete.getPlace && autocomplete.getPlace().address_components;
         const {isAuthenticated, user = {}} = auth;
@@ -177,19 +193,25 @@ class SubComponent extends React.Component {
         }
 
         const {selectedCountry, selectedState, selectedCity, selectedArea} = this.state;
+
         const buttonProvider = classnames({
-            'ant-btn ant-btn-primary': true,
-            'active': showProvider
+            'ant-btn ant-btn-link custom-links': true,
+            'active': showScreen === 'provider'
         });
         const buttonHelpingHand = classnames({
-            'ant-btn ant-btn-primary': true,
-            'active': showHelpingHand
+            'ant-btn ant-btn-link custom-links': true,
+            'active': showScreen === 'helpinghand'
+        });
+        const buttonUserStatus = classnames({
+            'ant-btn ant-btn-link custom-links': true,
+            'active': showScreen === 'searchStatus'
         });
         return (
 
             <div className="container">
-                <Button className={buttonProvider} onClick={() => this.setState({showProvider: true, showHelpingHand: false})}>Provider</Button>
-                <Button className={buttonHelpingHand} onClick={() => this.setState({showProvider: false, showHelpingHand: true})}>Hepling hand</Button>
+                <Button className={buttonProvider} onClick={() => this.changeScreen('provider')}>I want to donate</Button>
+                <Button className={buttonHelpingHand} onClick={() => this.changeScreen('helpinghand')}>Hepling hand</Button>
+                <Button className={buttonUserStatus} onClick={() => this.changeScreen('searchStatus')}>Track Status</Button>
 
                 {/* <div>{ad.text}</div>
                     <div id="locationField">
@@ -205,7 +227,13 @@ class SubComponent extends React.Component {
                         }
                         return null;
                     })} */}
-                {(showProvider || showHelpingHand) && <Form className="provider-form"
+
+                {/* {showScreen === 'helpinghand' && <div>
+                    <Button className="ant-btn ant-btn-primary" onClick={this.fetchProviders}>Raise Need</Button>
+                    <Button className="ant-btn ant-btn-primary" onClick={this.fetchProviders}>Search Request</Button>   
+                </div>} */}
+
+                {(showScreen === 'provider' || showScreen === 'helpinghand') && <Form className="provider-form"
                     labelCol={{span: 8}}
                     wrapperCol={{span: 14}}
                     layout="horizontal"
@@ -239,7 +267,7 @@ class SubComponent extends React.Component {
                             countries[selectedCountry][selectedState][selectedCity].map((item) => <Option key={item} value={item}>{item}</Option>)}
                         </Select>
                     </Form.Item>}
-                    {selectedArea && this.state.showProvider && <div>
+                    {selectedArea && showScreen === 'provider' && <div>
                         <Form.Item name={['user', 'address']} label="Detail Address">
                             {getFieldDecorator('user_address', {rules: [{required: true, message: 'Address is required'}]})(
                                 <Input.TextArea value={this.state.address} onChange={(e) => this.setFormItem(e.target.value, 'address')} />
@@ -255,22 +283,45 @@ class SubComponent extends React.Component {
                                 <InputNumber value={this.state.serves} onChange={(val) => this.setFormItem(val, 'serves')} />
                             )}
                         </Form.Item>
-                        <Form.Item label="Date" >
-                            {getFieldDecorator('serveOn', {rules: [{required: true, message: 'Please mention date you will provide food on'}]})(
-                                <DatePicker value={this.state.serveOn} onChange={(val) => this.setFormItem(val, 'serveOn')} />
+                        <Form.Item label="Mobile No">
+                            {getFieldDecorator('mobileNo', {rules: [
+                                {required: true, message: 'Mobile No'},
+                                {
+                                    required: true,
+                                    type: 'regexp',
+                                    pattern: new RegExp(/^([0|\+[0-9]{1,5})?([7-9][0-9]{9})$/g),
+                                    message: 'Wrong format!'
+                                }]
+                            })(
+                                <Input value={this.state.mobileNo} onChange={(e) => this.setFormItem(parseInt(e.target.value, 10), 'mobileNo')} />
                             )}
                         </Form.Item>
-                        <Form.Item label="Serve As" >
-                            {getFieldDecorator('serveas', {rules: [{required: true, message: 'Serve as'}]})(
+                        <Form.Item label="OTP">
+                            {getFieldDecorator('otp', {rules: [{required: true, message: 'Please enter OTP'}]})(
+                                <InputNumber value={this.state.otp} onChange={(val) => this.setFormItem(val, 'otp')} />
+                            )}
+                        </Form.Item>
+                        <Form.Item label="Date" >
+                            {getFieldDecorator('serveOn', {rules: [{required: true, message: 'Please mention date you will provide food on'}]})(
+                                <DatePicker
+                                    disabledDate = {(current) => {
+                                        // Can not select days before today and today
+                                        return current && current < moment().endOf('day');
+                                    }}
+                                    value={this.state.serveOn} onChange={(val) => this.setFormItem(val, 'serveOn')} />
+                            )}
+                        </Form.Item>
+                        <Form.Item label="Pickup time" >
+                            {getFieldDecorator('serveas', {rules: [{required: true, message: 'Please enter pickup time'}]})(
                                 // <Switch checkedChildren="LUNCH" unCheckedChildren="DINNER" checked={this.state.serveAs} onChange={(val) => this.setFormItem(val, 'serveAs')} />
                                 <Select placeholder="Please select a state" value={this.state.serveAs} onChange={(val) => this.setFormItem(val, 'serveAs')} >
-                                    {['LUNCH', 'SNACKS', 'DINNER'].map((item) => <Option key={item} value={item}>{item}</Option>)}
+                                    {Object.keys(timeSlots).map((item) => <Option key={item} value={item}>{timeSlots[item]}</Option>)}
                                 </Select>
                             )}
                         </Form.Item>
-                        <Button className="ant-btn ant-btn-primary" onClick={this.createProvider}>Create Request</Button>
+                        <Button className="ant-btn ant-btn-primary" onClick={this.createProvider}>Confirm</Button>
                     </div>}
-                    {selectedArea && this.state.showHelpingHand && <div>
+                    {selectedArea && showScreen === 'helpinghand' && <div>
                         {auth.user.username && <div>
                             <Button className="ant-btn ant-btn-primary" onClick={this.fetchProviders}>Fetch Providers</Button>
                             <RequestTable name={auth.user.username}/>
@@ -280,6 +331,19 @@ class SubComponent extends React.Component {
 
                     {responseMessage && <h3>{responseMessage.message}</h3>}
                 </Form>}
+            
+                {showScreen === 'searchStatus' && <div className="search-status">
+                    
+                    <Button className="ant-btn ant-btn-primary" onClick={this.getUsersRequest}>Get Status</Button>
+                    <InputNumber placeholder="Enter your mobile no" value={this.state.searchMob} onChange={(val) => this.setFormItem(val, 'searchMob')} />
+
+                    {userRequests && userRequests.map((item) => <div key={item.date}>
+                        {item.confirmedBy === null && <span>Awaiting confimation</span>}
+                        {item.confirmedBy !== null && <span>Confirmed By {item.confirmedBy}</span>}
+                    </div>)}
+                    {responseMessage && <h3>{responseMessage.message}</h3>}
+                </div>}
+            
             </div>
 
         );

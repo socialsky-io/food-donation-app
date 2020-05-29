@@ -125,28 +125,35 @@ module.exports = function () {
 
     async function confirmProvideRequest(reqBody) {
         const {confirmedBy = null, confirmedIdList = []} = reqBody;
-        console.log(confirmedBy, confirmedIdList)
         if(!confirmedBy) {
             return {message: 'Invalid Inputs'}
         }
+        // confirmedIdList = confirmedIdList.map((item) => ObjectID(item));
         // Update only if confirmedBy is null
         try{
-            const confirmedRequest = await ProviderSchema.update(
+            const confirmedRequest = await ProviderSchema.updateOne(
                 { _id: { $in: confirmedIdList } },
                 { $set: { confirmedBy : confirmedBy } },
                 {multi: true}
             );
-            return {message: 'Request Confirmed! Please be available to collect', error: err}
+            return {message: 'Request Confirmed! Please be available to collect'}
         } catch(err) {
             return {message: 'Unable to save info', error: err}
         }
      }
     
+
+    async function fetchUserStatus({data}) {
+        console.log(data)
+        userData = await ProviderSchema.findOne({mobileNo: data}); 
+        return userData;
+    }
     return {
             createProvideRequest: createProvideRequest,
             getDataByArea: getDataByArea,
             fetchUsersData: fetchUsersData,
-            confirmProvideRequest: confirmProvideRequest
+            confirmProvideRequest: confirmProvideRequest,
+            fetchUserStatus: fetchUserStatus
         }   
     
     }

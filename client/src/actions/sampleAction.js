@@ -8,6 +8,15 @@ export function addRequest(data) {
 export function removeRequest(data) {
     return {type: actions.REMOVE_REQUEST, payload: data};
 }
+export function getUserStatus(data) {
+    return {type: actions.GET_USERS_REQUEST, payload: data};
+}
+
+export function clearResponseMessage() {
+    return {type: actions.CLEAR_RESPONSE_MESSAGE};
+}
+
+
 
 
 export function createProvider(data) {
@@ -32,6 +41,10 @@ export function fetchProvidersSuccessful(data) {
 
 export function confirmRequestSuccessful(data) {
     return {type: `${actions.CONFIRM_REQUEST}${actions.API_SUFFIX.SUCCESS}`, payload: data};
+}
+
+export function getUserStatusSuccessful(data) {
+    return {type: `${actions.GET_USERS_REQUEST}${actions.API_SUFFIX.SUCCESS}`, payload: data};
 }
 
 export function requestFailed(payload) {

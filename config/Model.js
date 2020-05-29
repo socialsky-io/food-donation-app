@@ -13,6 +13,7 @@ var mongoose = require('mongoose'),
         description: String,
         providerName: String,
         providerAddress: String,
+        mobileNo: Number,
         serveAs: String
      });
     

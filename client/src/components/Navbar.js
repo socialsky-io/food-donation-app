@@ -27,7 +27,7 @@ export default class Navbar extends Component {
                     </div>
                     <div className="navbar-end">
                         <div className="navbar-item">
-                            <Switch className="theme-switch" checkedChildren="Light" unCheckedChildren="Dark" onChange={this.props.themeChange} value={this.props.darkTheme}/>
+                            {/* <Switch className="theme-switch" checkedChildren="Light" unCheckedChildren="Dark" onChange={this.props.themeChange} value={this.props.darkTheme}/> */}
                             {isAuthenticated && user && (
                                 <div className="user-welcome-text">Hello <b>{user.username}</b></div>
                             )}

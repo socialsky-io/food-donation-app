@@ -1,7 +1,8 @@
 
 
 
-import {CREATE_PROVIDER_REQUEST, FETCH_PROVIDER_REQUEST, API_SUFFIX, REMOVE_REQUEST, ADD_REQUEST, CONFIRM_REQUEST} from '../actions/actionTypes';
+import {CREATE_PROVIDER_REQUEST, FETCH_PROVIDER_REQUEST, API_SUFFIX, GET_USERS_REQUEST,
+    REMOVE_REQUEST, ADD_REQUEST, CONFIRM_REQUEST, CLEAR_RESPONSE_MESSAGE} from '../actions/actionTypes';
 
 const {SUCCESS} = API_SUFFIX;
 
@@ -10,11 +11,36 @@ export default function sampleReducer(initialState = {}) {
         switch (action.type) {
             case CREATE_PROVIDER_REQUEST:
             case FETCH_PROVIDER_REQUEST:
+            case GET_USERS_REQUEST:
             case CONFIRM_REQUEST:
                 return {
                     ...state,
                     loading:true
                 };
+            case CLEAR_RESPONSE_MESSAGE: {
+                return {
+                    ...state,
+                    responseMessage: {}
+                };
+            }
+            case `${GET_USERS_REQUEST}${SUCCESS}`:
+                var userRequests = action.payload;
+                var responseMessage = {};
+                if(action.payload.message) {
+                    userRequests = [];
+                    responseMessage = action.payload;
+                }
+                return Object.assign({}, {
+                    ...state,
+                    loading: false,
+                    userRequests: userRequests.map((data, index) => {
+                        return {
+                            key: data.key || index,
+                            ...data
+                        };
+                    }),
+                    responseMessage
+                });
             case `${CREATE_PROVIDER_REQUEST}${SUCCESS}`:
                 return Object.assign({}, {
                     ...state,

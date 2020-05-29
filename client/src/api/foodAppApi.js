@@ -24,8 +24,14 @@ const confirmRequestApi$ = (payload) => {
     return http.post(`${baseURL}/confirmProvideRequest`, payload).pipe(simpleMapPipe);
 };
 
+const fetchUsersStatusApi$ = (queryParam) => {
+    queryParam = getQueryParams(queryParam);
+    return http.get(`${baseURL}/fetchUserStatus`, queryParam).pipe(simpleMapPipe);
+};
+
 export {
     createProviderRequestApi$,
     fetchProviderRequestApi$,
-    confirmRequestApi$
+    confirmRequestApi$,
+    fetchUsersStatusApi$
 };

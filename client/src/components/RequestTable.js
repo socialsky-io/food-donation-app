@@ -5,6 +5,12 @@ import {bindAll, kebabCase, isEmpty, isEqual} from 'lodash';
 import {connect} from 'react-redux';
 import {addRequest, removeRequest} from '../actions/sampleAction';
 
+const timeSlots = {
+    LUNCH: '11am - 1pm',
+    SNACKS: '3pm - 6pm',
+    DINNER: '7pm - 9pm'
+};
+
 class RequestTable extends React.Component {
 
     constructor(props) {
@@ -27,7 +33,11 @@ class RequestTable extends React.Component {
             return null;
         }
         allProviders = allProviders.map((item) => {
-            return {...item, date: item.date.split('T')[0]};
+            return {
+                ...item, 
+                date: item.date.split('T')[0],
+                serveAs: timeSlots[item.serveAs]
+            };
         });
         const defaultcolumns = [
             {
@@ -68,7 +78,7 @@ class RequestTable extends React.Component {
                 render: (text, record) => (
                     <div>
                         {record.confirmedBy === null && <Button onClick={() => this.confirmProvider(record)} >ADD</Button>}
-                        {record.confirmedBy !== null && record.confirmedBy !== this.props.name && <span>Already Booked</span>}
+                        {record.confirmedBy !== null && record.confirmedBy !== this.props.name && <span>Already Booked {record.confirmedBy}</span>}
                         {record.confirmedBy !== null && record.confirmedBy == this.props.name && <Button onClick={() => this.cancelProvider(record)} >Remove</Button>}
                     </div>
                 )

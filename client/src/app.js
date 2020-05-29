@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import { BrowserRouter as Router, Route, Switch } from 'react-router-dom';
+import {BrowserRouter as Router, Route, Switch} from 'react-router-dom';
 import SubComponent from './components/subComponent/subComponent.Connect';
 
 import Navbar from './components/Navbar';
@@ -10,8 +10,8 @@ import ForgotPassword from './components/auth/ForgotPassword';
 import ForgotPasswordVerification from './components/auth/ForgotPasswordVerification';
 import ChangePassword from './components/auth/ChangePassword';
 import ChangePasswordConfirm from './components/auth/ChangePasswordConfirm';
-import { library } from '@fortawesome/fontawesome-svg-core';
-import { faEdit } from '@fortawesome/free-solid-svg-icons';
+import {library} from '@fortawesome/fontawesome-svg-core';
+import {faEdit} from '@fortawesome/free-solid-svg-icons';
 import {Auth} from 'aws-amplify';
 import classnames from 'classnames';
 
@@ -70,25 +70,32 @@ class App extends Component {
             'App': true,
             'dark-theme': this.state.darkTheme
         });
+        const darkModal = classnames({
+            'dark-modal': this.state.darkTheme
+        });
+
         return (
-            <div className={appClass}>
-                <Router>
-                    <div>
-                        <Navbar auth={authProps} themeChange={this.themeChange} themetype={this.state.darkTheme} />
-                        <Switch>
-                            <Route exact path="/" render={(props) => <SubComponent {...props} auth={authProps} />} />
-                            <Route exact path="/login" render={(props) => <LogIn {...props} auth={authProps} />} />
-                            <Route exact path="/register" render={(props) => <Register {...props} auth={authProps} />} />
-                            <Route exact path="/forgotpassword" render={(props) => <ForgotPassword {...props} auth={authProps} />} />
-                            <Route exact path="/forgotpasswordverification" render={(props) => <ForgotPasswordVerification {...props} auth={authProps} />} />
-                            <Route exact path="/changepassword" render={(props) => <ChangePassword {...props} auth={authProps} />}/>
-                            <Route exact path="/changepasswordconfirmation" render={(props) => <ChangePasswordConfirm {...props} auth={authProps} />} />
-                            <Route exact path="/app" render={(props) => <SubComponent {...props} auth={authProps} />} />
-                            <Route exact path="/guestLogin" render={(props) => <GuestUser {...props} auth={authProps} />} />    
-                        </Switch>
-                    </div>
-                </Router>
-            </div>
+            <React.Fragment>
+                <div className={darkModal}></div>
+                <div className={appClass}>
+                    <Router>
+                        <React.Fragment>
+                            <Navbar auth={authProps} themeChange={this.themeChange} themetype={this.state.darkTheme} />
+                            <Switch>
+                                <Route exact path="/" render={(props) => <SubComponent {...props} auth={authProps} />} />
+                                <Route exact path="/login" render={(props) => <LogIn {...props} auth={authProps} />} />
+                                <Route exact path="/register" render={(props) => <Register {...props} auth={authProps} />} />
+                                <Route exact path="/forgotpassword" render={(props) => <ForgotPassword {...props} auth={authProps} />} />
+                                <Route exact path="/forgotpasswordverification" render={(props) => <ForgotPasswordVerification {...props} auth={authProps} />} />
+                                <Route exact path="/changepassword" render={(props) => <ChangePassword {...props} auth={authProps} />}/>
+                                <Route exact path="/changepasswordconfirmation" render={(props) => <ChangePasswordConfirm {...props} auth={authProps} />} />
+                                <Route exact path="/app" render={(props) => <SubComponent {...props} auth={authProps} />} />
+                                <Route exact path="/guestLogin" render={(props) => <GuestUser {...props} auth={authProps} />} />
+                            </Switch>
+                        </React.Fragment>
+                    </Router>
+                </div>
+            </React.Fragment>
         );
     }
 }

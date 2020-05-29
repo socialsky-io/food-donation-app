@@ -2,14 +2,14 @@ import {map, switchMap, mergeMap, takeUntil} from 'rxjs/operators';
 import {from as fromRxOperator} from 'rxjs';
 import {camelCase, isEmpty} from 'lodash';
 import * as actionTypes from '../actions/actionTypes';
-import {createProviderSuccessful, fetchProvidersSuccessful, confirmRequestSuccessful} from '../actions/sampleAction';
+import {createProviderSuccessful, fetchProvidersSuccessful, confirmRequestSuccessful, getUserStatusSuccessful} from '../actions/sampleAction';
 import {combineEpics} from 'redux-observable';
 
 const API_NAME = 'foodAppApi';
 
 const {CREATE_PROVIDER_REQUEST, FETCH_PROVIDER_REQUEST} = actionTypes;
 
-const fetchChargeCodeEpic = (action$, state$, {apis}) => {
+const fetchProvideRequestEpic = (action$, state$, {apis}) => {
     const action = CREATE_PROVIDER_REQUEST;
     return action$
         .ofType(action)
@@ -32,6 +32,20 @@ const fetchProviderRequestEpic = (action$, state$, {apis}) => {
                 return apis[API_NAME].fetchProviderRequestApi$(payload);
             }),
             map((result) => fetchProvidersSuccessful(result))
+        );
+};
+
+
+const fetchUsersStatusEpic = (action$, state$, {apis}) => {
+    const action = actionTypes.GET_USERS_REQUEST;
+    return action$
+        .ofType(action)
+        .pipe(
+            switchMap((metaData) => {
+                const {payload} = metaData;
+                return apis[API_NAME].fetchUsersStatusApi$(payload);
+            }),
+            map((result) => getUserStatusSuccessful(result))
         );
 };
 
@@ -60,8 +74,9 @@ const confirmRequestEpic = (action$, state$, {apis}) => {
 // COMBINE ALL EPICS
 const foodAppEpic = () => {
     return combineEpics(
-        fetchChargeCodeEpic,
+        fetchProvideRequestEpic,
         fetchProviderRequestEpic,
+        fetchUsersStatusEpic,
         confirmRequestEpic
     );
 };

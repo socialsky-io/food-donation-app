@@ -27,7 +27,8 @@ module.exports = async function (providerData) {
                         serves: 0,
                         description: '',
                         providerName: '',
-                        providerAddress: ''
+                        providerAddress: '',
+                        mobileNo: null
                      }]
                 }]
             }]

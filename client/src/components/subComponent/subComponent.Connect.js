@@ -1,15 +1,16 @@
 import {connect} from 'react-redux';
 import SubComponent from './subComponent';
-import {createProvider, fetchProviders, confirmRequest} from '../../actions/sampleAction';
+import {createProvider, fetchProviders, confirmRequest, getUserStatus, clearResponseMessage} from '../../actions/sampleAction';
 import {withRouter} from 'react-router-dom';
 const mapStateToProps = (state) => {
     const {sampleReducer = {}} = state;
-    const {allProviders = [], createStatus = {}, responseMessage, reqAdded} = sampleReducer;
+    const {allProviders = [], createStatus = {}, responseMessage, reqAdded, userRequests} = sampleReducer;
     
     return {
         createStatus,
         allProviders,
         responseMessage,
+        userRequests,
         reqAdded
     };
 };
@@ -24,6 +25,12 @@ const mapDispatchToProps = (dispatch) => {
         },
         confirmRequest: (payload) => {
             dispatch(confirmRequest(payload));
+        },
+        getUserStatus: (payload) => {
+            dispatch(getUserStatus(payload));
+        },
+        clearResponseMessage: () => {
+            dispatch(clearResponseMessage());
         }
     };
 };
