@@ -114,9 +114,6 @@ class LogIn extends Component {
                               <a href="/guestLogin" className="button is-primary back-game-btn">
                                 Guest Login
                               </a>
-                              <a href="/app" className="button is-primary back-game-btn">
-                                    App >>
-                              </a>
                           </p>
                       </div>
                   </form>

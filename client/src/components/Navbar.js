@@ -39,6 +39,10 @@ export default class Navbar extends Component {
                                 )}
                                 {!isAuthenticated && !user && (
                                     <Fragment>
+
+                                        <a href="/aboutus" className="button is-light">
+                                            How it works
+                                        </a>
                                         <a href="/register" className="button is-primary">
                                             Register
                                         </a>

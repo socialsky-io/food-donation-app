@@ -4,14 +4,15 @@ import {createProvider, fetchProviders, confirmRequest, getUserStatus, clearResp
 import {withRouter} from 'react-router-dom';
 const mapStateToProps = (state) => {
     const {sampleReducer = {}} = state;
-    const {allProviders = [], createStatus = {}, responseMessage, reqAdded, userRequests} = sampleReducer;
+    const {allProviders = [], createStatus = {}, responseMessage, reqAdded, loading, userRequests} = sampleReducer;
     
     return {
         createStatus,
         allProviders,
         responseMessage,
         userRequests,
-        reqAdded
+        reqAdded,
+        loading
     };
 };
 

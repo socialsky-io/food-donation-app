@@ -2,6 +2,16 @@ html{
   overflow-y: hidden;
 }
 
+.aboutus{
+  .aboutus-title{
+    font-size: 20px;
+    font-weight: bold;
+    margin-bottom: 20px;
+    margin-top: 20px;
+
+  }
+}
+
 .container{
     width: 100%;
     clear: both;
@@ -31,10 +41,11 @@ html{
     background-size: 100% 100%;
 }
 .request-table{
-    margin-top: 20px;
-    margin-bottom: 20px;
-    width: 100%;
-    overflow: auto;
+  margin-top: 20px;
+  margin-bottom: 100px;
+  width: 90%;
+  min-width: 650px;
+  overflow: auto;
 }
 
 .log-out-btn{
@@ -89,35 +100,9 @@ html{
   }
   
 
-
-  @media screen and (max-width: 720px) {
-    .navbar-menu{
-        display: block !important;
-      }
-      .primary-button{
-        font-size: 14px;
-        width: 34%;
-      }
-
-      .navbar-item{
-        height: 40px;
-        font-size: 16px;
-        .user-welcome-text{
-          float: left;
-        }
-        .buttons{
-          float: right;
-        }
-      }
-
-      .provider-form{
-          max-width: 500px;
-          width: 90%;
-      }
-      .ant-table table{
-          width: 90%;
-          max-width: 500px;
-      }
+  .ant-table-thead > tr > th, .ant-table-tbody > tr > td {
+    padding: 10px 5px;
+    padding-bottom: 0px;
   }
 
 
@@ -225,6 +210,61 @@ html{
   .ant-carousel .slick-slide h3 {
     color: #fff;
   }
+
+
+
+
+  
+  @media screen and (max-width: 720px) {
+    .navbar-menu{
+      display: block !important;
+      background: none;
+    }
+    .aboutus{
+      .aboutus-title{
+        font-size: 16px;
+      }
+      p{
+        font-size: 14px;
+      }
+    }
+    .primary-button{
+      font-size: 14px;
+      width: 34%;
+    }
+
+    .navbar-item{
+      height: 40px;
+      font-size: 16px;
+      .user-welcome-text{
+        float: left;
+      }
+      .buttons{
+        float: right;
+      }
+    }
+
+    .provider-form{
+        max-width: 500px;
+        width: 90%;
+    }
+    .ant-table table{
+        width: 90%;
+        max-width: 500px;
+    }
+
+    body #app .dark-theme {
+      .ant-btn{
+        margin: 10px 2px;
+        padding: 0px 5px;
+      }
+      .ant-btn.custom-links span {
+        font-size: 16px;
+      }
+
+    }
+}
+
 
   /*
 .bg-5 {

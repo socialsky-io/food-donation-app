@@ -5,6 +5,7 @@ import SubComponent from './components/subComponent/subComponent.Connect';
 import Navbar from './components/Navbar';
 import LogIn from './components/auth/LogIn';
 import GuestUser from './components/auth/GuestUser';
+import AboutUs from './components/aboutUs';
 import Register from './components/auth/Register';
 import ForgotPassword from './components/auth/ForgotPassword';
 import ForgotPasswordVerification from './components/auth/ForgotPasswordVerification';
@@ -91,6 +92,7 @@ class App extends Component {
                                 <Route exact path="/changepasswordconfirmation" render={(props) => <ChangePasswordConfirm {...props} auth={authProps} />} />
                                 <Route exact path="/app" render={(props) => <SubComponent {...props} auth={authProps} />} />
                                 <Route exact path="/guestLogin" render={(props) => <GuestUser {...props} auth={authProps} />} />
+                                <Route exact path="/aboutUs" render={(props) => <AboutUs {...props} auth={authProps} />} />
                             </Switch>
                         </React.Fragment>
                     </Router>

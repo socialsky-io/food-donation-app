@@ -41,45 +41,56 @@ class RequestTable extends React.Component {
         });
         const defaultcolumns = [
             {
-                title: 'Provider Name',
-                dataIndex: 'providerName',
-                key: 'providerName',
-                sorter: (a, b) => a.providerName.localeCompare(b.providerName),
-                sortDirections: ['ascend', 'descend']
+                title: 'Date',
+                dataIndex: 'date',
+                key: 'date',
+                width: '150px',
+                sorter: (a, b) => new Date(a.date) - new Date(b.date)
             },
             {
                 title: 'Serve count',
                 dataIndex: 'serves',
                 key: 'serves',
+                width: '100px',
                 sorter: (a, b) => a.serves - b.serves
             },
             {
-                title: 'Serves As',
+                title: 'Pickup Time',
                 dataIndex: 'serveAs',
                 key: 'serveAs',
+                width: '130px',
                 sorter: (a, b) => a.serveAs.localeCompare(b.serveAs)
             },
             {
                 title: 'Provider Address',
                 dataIndex: 'providerAddress',
                 key: 'providerAddress',
+                width: '250px',
                 sorter: (a, b) => a.serveAs.localeCompare(b.serveAs)
             },
-            
             {
-                title: 'Date',
-                dataIndex: 'date',
-                key: 'date',
-                sorter: (a, b) => new Date(a.date) - new Date(b.date)
-            }, {
+                title: 'Provider Name',
+                dataIndex: 'providerName',
+                key: 'providerName',
+                width: '150px',
+                sorter: (a, b) => a.providerName.localeCompare(b.providerName),
+                sortDirections: ['ascend', 'descend']
+            },
+            {
+                title: 'Contact No',
+                dataIndex: 'mobileNo',
+                key: 'mobileNo',
+                width: '150px'
+            },
+            {
                 title: 'Action',
                 key: 'action',
                 width: '100px',
                 render: (text, record) => (
                     <div>
-                        {record.confirmedBy === null && <Button onClick={() => this.confirmProvider(record)} >ADD</Button>}
-                        {record.confirmedBy !== null && record.confirmedBy !== this.props.name && <span>Already Booked {record.confirmedBy}</span>}
-                        {record.confirmedBy !== null && record.confirmedBy == this.props.name && <Button onClick={() => this.cancelProvider(record)} >Remove</Button>}
+                        {record.confirmedBy === null && <Button onClick={() => this.confirmProvider(record)} >Pickup</Button>}
+                        {record.confirmedBy !== null && record.confirmedBy !== this.props.name && <span>{record.confirmedBy} will pickup</span>}
+                        {record.confirmedBy !== null && record.confirmedBy == this.props.name && <Button onClick={() => this.cancelProvider(record)} >Cancel pickup</Button>}
                     </div>
                 )
             }
