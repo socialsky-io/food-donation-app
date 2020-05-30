@@ -2,14 +2,14 @@ import {map, switchMap, mergeMap, takeUntil} from 'rxjs/operators';
 import {from as fromRxOperator} from 'rxjs';
 import {camelCase, isEmpty} from 'lodash';
 import * as actionTypes from '../actions/actionTypes';
-import {createProviderSuccessful, fetchProvidersSuccessful, confirmRequestSuccessful, getUserStatusSuccessful} from '../actions/sampleAction';
+import {createProviderSuccessful, fetchProvidersSuccessful, confirmRequestSuccessful, getUserStatusSuccessful, getHelpingHandsSuccessful} from '../actions/sampleAction';
 import {combineEpics} from 'redux-observable';
 
 const API_NAME = 'foodAppApi';
 
 const {CREATE_PROVIDER_REQUEST, FETCH_PROVIDER_REQUEST} = actionTypes;
 
-const fetchProvideRequestEpic = (action$, state$, {apis}) => {
+const createProvideRequestEpic = (action$, state$, {apis}) => {
     const action = CREATE_PROVIDER_REQUEST;
     return action$
         .ofType(action)
@@ -50,6 +50,22 @@ const fetchUsersStatusEpic = (action$, state$, {apis}) => {
 };
 
 
+const fetchHelpingHandsEpic = (action$, state$, {apis}) => {
+    const action = actionTypes.FETCH_HELPING_HANDS;
+    return action$
+        .ofType(action)
+        .pipe(
+            switchMap((metaData) => {
+                const {payload} = metaData;
+                return apis[API_NAME].fetchHelpingHandsApi$(payload);
+            }),
+            map((result) => getHelpingHandsSuccessful(result))
+        );
+};
+
+
+
+
 const confirmRequestEpic = (action$, state$, {apis}) => {
     const action = actionTypes.CONFIRM_REQUEST;
     return action$
@@ -62,7 +78,8 @@ const confirmRequestEpic = (action$, state$, {apis}) => {
                 const {payload = {}} = metaData;
                 const newpayload = {
                     confirmedIdList: reqAdded,
-                    confirmedBy: payload.name
+                    confirmedBy: payload.name,
+                    helpingHandContactNo: payload.contactNo
                 };
                 return apis[API_NAME].confirmRequestApi$(newpayload);
             }),
@@ -74,9 +91,10 @@ const confirmRequestEpic = (action$, state$, {apis}) => {
 // COMBINE ALL EPICS
 const foodAppEpic = () => {
     return combineEpics(
-        fetchProvideRequestEpic,
+        createProvideRequestEpic,
         fetchProviderRequestEpic,
         fetchUsersStatusEpic,
+        fetchHelpingHandsEpic,
         confirmRequestEpic
     );
 };

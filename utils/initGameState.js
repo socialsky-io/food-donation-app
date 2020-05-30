@@ -28,6 +28,7 @@ module.exports = async function (providerData) {
                         description: '',
                         providerName: '',
                         providerAddress: '',
+                        helpingHandContactNo: null,
                         mobileNo: null
                      }]
                 }]

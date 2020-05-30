@@ -7,16 +7,24 @@ module.exports = function () {
             State,
             City,
             Areas,
-            ProviderSchema
+            ProviderSchema,
+            HelpingHandRegisterSchema
         } = require('../config/Model');
     
     var ObjectID = require('mongodb').ObjectID;
     var {timeSlots} = require('../config/appConfig');
     
     async function createLocationEntry(level, payload) {
-        const {provider, areaName, city, state, country} = payload;
+        const {provider, areaName, city, state, country, helpingHand} = payload;
+
+        let objectType = {}
+        if(provider) {
+            objectType = { name: areaName, providers: [provider]}
+        } else {
+            objectType = { name: areaName, helpingHandRegistered: [helpingHand]}
+        }
     
-        var newAreas = await (new Areas({ name: areaName, providers: [provider]})).save();
+        var newAreas = await (new Areas(objectType)).save();
         if(level === 'areas') {   
             return newAreas;
         }
@@ -87,6 +95,49 @@ module.exports = function () {
         }    
     }
 
+
+    async function registerHelpingHand(payload = {}) {
+    
+        let {areaName = '', city = '', state = '', country = '', ...rest} = payload;
+        
+        const helpingHand = new HelpingHandRegisterSchema(rest);
+        helpingHand.save()
+    
+        let countryData = null, stateData = null, cityData = null, areaData = null;
+        if(areaName && city && state && country) {        
+            countryData = await Country.findOne({name: country}); 
+            if(countryData) {
+                stateData = await State.findOne({name: state}); 
+                if(stateData) {
+                    cityData = await City.findOne({name: city}); 
+                    if(cityData) {
+                        areaData = await Areas.findOne({name: areaName}); 
+                        if(areaData) {
+                            areaData.helpingHandRegistered.push(helpingHand);
+                        } else {
+                            areaData = await createLocationEntry('areas', {helpingHand, areaName});
+                            cityData.areas.push(areaData);
+                        }
+                        await areaData.save()
+                    } else {
+                        cityData = await createLocationEntry('city', {helpingHand, areaName, city}); 
+                        stateData.cities.push(cityData);
+                    }
+                    await cityData.save()
+                } else {
+                    stateData = await createLocationEntry('state', {helpingHand, areaName, city, state});
+                    countryData.states.push(stateData);
+                }
+                await stateData.save()
+            } else {
+                countryData = await createLocationEntry('country', {helpingHand, areaName, city, state, country});
+            }
+            await countryData.save()
+        } else {
+            return 'Incomplete Data';
+        }    
+    }
+
     async function fetchUsersData(areaObj) {
          // To fetch country then get state thn city -- as state, city can be duplicate
          let providersInArea = await Areas.findOne({_id: areaObj._id}).populate('providers').exec();
@@ -99,19 +150,30 @@ module.exports = function () {
         }
     }
 
-    async function getDataByArea({country = 'India', state = 'Mahrashtra', city = 'Pune', areaName}) {
-      
+    async function fetchReisteredHelpingHand(areaObj) {
+        // To fetch country then get state thn city -- as state, city can be duplicate
+        let helpingHandInArea = await Areas.findOne({_id: areaObj._id}).populate('helpingHandRegistered').exec();
+        // let providersInArea = await Areas.findOne({name: areaName}).populate('providers').exec();
+        // gameData = gameData.populate('areas').exec();
+       if(helpingHandInArea && helpingHandInArea.helpingHandRegistered.length > 0) {
+           return helpingHandInArea.helpingHandRegistered;
+       } else {
+           return {message: 'No Helping found at this place', area: null}
+       }
+   }
+
+    
+
+    async function getDataByArea({country, state, city, areaName}) {
+        
         if(country && state && city && areaName) {
             try {
                 let provideCountry = await Country.findOne({name: country}).populate('states').exec();
                 stateObj = provideCountry.states.find((item) => item.name === state);
-
                 let provideState = await State.findOne({_id: stateObj._id}).populate('cities').exec();
                 cityObj = provideState.cities.find((item) => item.name === city);
-
                 let provideCity = await City.findOne({_id: cityObj._id}).populate('areas').exec();
                 areaObj = provideCity.areas.find((item) => item.name === areaName);
-
                 return areaObj;
             }
             catch {
@@ -124,7 +186,7 @@ module.exports = function () {
 
 
     async function confirmProvideRequest(reqBody) {
-        const {confirmedBy = null, confirmedIdList = []} = reqBody;
+        const {confirmedBy = null, confirmedIdList = [], helpingHandContactNo = null} = reqBody;
         if(!confirmedBy) {
             return {message: 'Invalid Inputs'}
         }
@@ -133,7 +195,7 @@ module.exports = function () {
         try{
             const confirmedRequest = await ProviderSchema.updateOne(
                 { _id: { $in: confirmedIdList } },
-                { $set: { confirmedBy : confirmedBy } },
+                { $set: { confirmedBy : confirmedBy, helpingHandContactNo: helpingHandContactNo } },
                 {multi: true}
             );
             return {message: 'Request Confirmed! Please be available to collect'}
@@ -153,7 +215,9 @@ module.exports = function () {
             getDataByArea: getDataByArea,
             fetchUsersData: fetchUsersData,
             confirmProvideRequest: confirmProvideRequest,
-            fetchUserStatus: fetchUserStatus
+            fetchUserStatus: fetchUserStatus,
+            registerHelpingHand: registerHelpingHand,
+            fetchReisteredHelpingHand: fetchReisteredHelpingHand
         }   
     
     }

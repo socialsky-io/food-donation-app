@@ -1,7 +1,7 @@
 
 
 
-import {CREATE_PROVIDER_REQUEST, FETCH_PROVIDER_REQUEST, API_SUFFIX, GET_USERS_REQUEST,
+import {CREATE_PROVIDER_REQUEST, FETCH_PROVIDER_REQUEST, API_SUFFIX, GET_USERS_REQUEST, FETCH_HELPING_HANDS,
     REMOVE_REQUEST, ADD_REQUEST, CONFIRM_REQUEST, CLEAR_RESPONSE_MESSAGE} from '../actions/actionTypes';
 
 const {SUCCESS} = API_SUFFIX;
@@ -12,6 +12,7 @@ export default function sampleReducer(initialState = {}) {
             case CREATE_PROVIDER_REQUEST:
             case FETCH_PROVIDER_REQUEST:
             case GET_USERS_REQUEST:
+            case FETCH_HELPING_HANDS:
             case CONFIRM_REQUEST:
                 return {
                     ...state,
@@ -20,7 +21,9 @@ export default function sampleReducer(initialState = {}) {
             case CLEAR_RESPONSE_MESSAGE: {
                 return {
                     ...state,
-                    responseMessage: {}
+                    responseMessage: {},
+                    areawiseHelpingHands: [],
+                    helpingHandResponse: {}
                 };
             }
             case `${GET_USERS_REQUEST}${SUCCESS}`:
@@ -54,16 +57,20 @@ export default function sampleReducer(initialState = {}) {
                     responseMessage: action.payload,
                     reqAdded: []
                 });
-            case `${FETCH_PROVIDER_REQUEST}${SUCCESS}`:
-                var allProviders = action.payload;
-                var responseMessage = {};
+            case `${FETCH_PROVIDER_REQUEST}${SUCCESS}`: {
+                let allProviders = [];
+                let responseMessage = {};
+                // let helpingHands = [];
                 if(action.payload.message) {
-                    allProviders = [];
                     responseMessage = action.payload;
+                } else {
+                    allProviders = action.payload;
+                    // helpingHands = action.payload.helpingHands;
                 }
                 return Object.assign({}, {
                     ...state,
                     loading: false,
+                    // helpingHands: helpingHands,
                     allProviders: allProviders.map((data, index) => {
                         return {
                             key: data.key || index,
@@ -72,8 +79,28 @@ export default function sampleReducer(initialState = {}) {
                     }),
                     responseMessage
                 });
+            }
 
-
+            case `${FETCH_HELPING_HANDS}${SUCCESS}`: {
+                let areawiseHelpingHands = [];
+                let helpingHandResponse = {};
+                if(action.payload.message) {
+                    helpingHandResponse = action.payload;
+                } else {
+                    areawiseHelpingHands = action.payload;
+                }
+                return Object.assign({}, {
+                    ...state,
+                    loading: false,
+                    areawiseHelpingHands: areawiseHelpingHands.map((data, index) => {
+                        return {
+                            key: data.key || index,
+                            ...data
+                        };
+                    }),
+                    helpingHandResponse
+                });
+            }
             case ADD_REQUEST: {
                 const newAdded = [...state.reqAdded];
                 const confirmedLocalData = state.allProviders.map((item, index) => {

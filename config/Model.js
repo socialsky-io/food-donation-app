@@ -10,6 +10,7 @@ var mongoose = require('mongoose'),
         status: String,
         confirmedBy: String,
         serves: Number,
+        helpingHandContactNo: Number,
         description: String,
         providerName: String,
         providerAddress: String,
@@ -18,6 +19,19 @@ var mongoose = require('mongoose'),
      });
     
     var ProviderSchema = mongoose.model("ProviderSchema", providerRequestSchema);
+
+
+    const registeredHelpingHandSchema = mongoose.Schema({
+        // _id: mongoose.Schema.Types.ObjectId,
+        availableTimeSlot: String,
+        workingDays: String,
+        // time: TimeRanges,
+        helpingHandContactNo: Number,
+        serviceableArea: String,
+        name: String
+     });
+    
+    var HelpingHandRegisterSchema = mongoose.model("RegisteredHelpingHand", registeredHelpingHandSchema);
 
      
     // var providerRequestsSchema = mongoose.Schema({
@@ -28,7 +42,8 @@ var mongoose = require('mongoose'),
 
     var areasSchema = mongoose.Schema({
         name:   { type: String },
-        providers: [ { type: ObjectId, ref: ProviderSchema } ]
+        providers: [ { type: ObjectId, ref: ProviderSchema } ],
+        helpingHandRegistered: [ { type: ObjectId, ref: HelpingHandRegisterSchema } ]
     });
     var Areas = mongoose.model('Areas', areasSchema);
 
@@ -61,5 +76,6 @@ module.exports = {
     State,
     City,
     Areas,
-    ProviderSchema
+    ProviderSchema,
+    HelpingHandRegisterSchema
 }

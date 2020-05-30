@@ -17,7 +17,8 @@ var initGameState = require('./utils/initGameState');
 var saveGameState = require('./utils/saveGameState');
 
 
-var {fetchUsersData, createProvideRequest, getDataByArea, confirmProvideRequest, fetchUserStatus} = cardUtils;
+var {fetchUsersData, createProvideRequest, getDataByArea, fetchReisteredHelpingHand,
+   registerHelpingHand, confirmProvideRequest, fetchUserStatus} = cardUtils;
 
 saveGameState()
 
@@ -47,17 +48,35 @@ app.post('/api/createProvideRequest', async function(req, res) {
    res.status(200).send({message: 'Good Work!! We have registered your help. Awaiting confirmation from helping hand.'})
 })
 
+app.post('/api/registerHelpingHand', async function(req, res) {
+   const registeredHelper = await registerHelpingHand(req.body);
+   res.status(200).send({message: 'You are registered helping hand in this area'})
+})
+
 
 app.get('/api/fetchProviders', async function (req, res) {
    const areaData = await getDataByArea(req.query); 
    if(!areaData || areaData.area === null) {
       res.status(200).send({message: 'No Provider found at this place'});
    } else {
-      const newProviderData = await fetchUsersData(areaData);
-      res.status(200).send(newProviderData);
+      const allProviders = await fetchUsersData(areaData);
+      res.status(200).send(allProviders);
    }
 });
 
+
+app.get('/api/fetchHelpingHand', async function (req, res) {
+   const areaData = await getDataByArea(req.query); 
+   if(!areaData || areaData.area === null) {
+      res.status(200).send({message: 'No Helping hand available to serve this area'});
+   } else {
+      const helpingHands = await fetchReisteredHelpingHand(areaData);
+      res.status(200).send(helpingHands);
+   }
+});
+
+
+ 
 app.post('/api/confirmProvideRequest', async function(req, res) {
    const newProviderData = await confirmProvideRequest(req.body);
    res.status(200).send(newProviderData)

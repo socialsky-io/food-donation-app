@@ -21,8 +21,6 @@ class AboutUs extends Component {
                       <p><b>NEEDY </b>- Person is in need of food during specific date & time. They are not using app, they are just poor who are being noticed by HELPING HAND person/group.</p>
                       <br/>
                       <p><b>HELPING HAND</b> - would be the one who would be collecting the food from PROVIDER & will provide the food to NEEDY ( helping hand can be public servant like police, muncipalty person etc or some individual/group)</p>
-                      <br/>
-                      <p><b>FOOD SPOTS</b> -- Any user can register to create food-spot and handle responsibility for the same. He'll be responsible for food spot management (Food spots can be available for 2-3 hours a day for saving waiting time of everyone)</p>
                       <hr></hr>
                       <p><b>BUSINESS VALUE</b> -- This idea itself can be considered as prototype implementation of business sceanrio. 
                         Many scenarios can use this underlying model.

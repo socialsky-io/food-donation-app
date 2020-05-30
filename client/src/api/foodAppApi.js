@@ -3,8 +3,8 @@ import {simpleMapPipe} from './pipes.api';
 
 const http = new RxPhoenixHttp();
 
-// const baseURL = 'http://localhost:8070/api';
-const baseURL = '/api';
+const baseURL = 'http://localhost:8070/api';
+// const baseURL = '/api';
 
 const getQueryParams = (parameters) => {
     return Object.keys(parameters).map(paramKey => `${paramKey}=${parameters[paramKey]}`).join('&');
@@ -29,9 +29,15 @@ const fetchUsersStatusApi$ = (queryParam) => {
     return http.get(`${baseURL}/fetchUserStatus`, queryParam).pipe(simpleMapPipe);
 };
 
+const fetchHelpingHandsApi$ = (queryParam) => {
+    queryParam = getQueryParams(queryParam);
+    return http.get(`${baseURL}/fetchHelpingHand`, queryParam).pipe(simpleMapPipe);
+}
+
 export {
     createProviderRequestApi$,
     fetchProviderRequestApi$,
     confirmRequestApi$,
+    fetchHelpingHandsApi$,
     fetchUsersStatusApi$
 };

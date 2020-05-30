@@ -7,6 +7,7 @@ import classnames from 'classnames';
 import moment from 'moment';
 
 import RequestTable from '../RequestTable';
+import HelpingHandsTable from '../HelpingHandsTable';
 
 const Option = Select.Option;
 
@@ -49,7 +50,7 @@ class SubComponent extends React.Component {
             showHelpingHand: false,
             searchMob: null
         };
-        bindAll(this, ['createProvider', 'checkIfErrors', 'selectedArea', 'geolocate', 'changeScreen', 'initAutocomplete', 'fetchProviders', 'getUsersRequest', 'confirmProvideRequest']);
+        bindAll(this, ['createProvider', 'checkIfErrors', 'selectedArea', 'geolocate', 'changeScreen', 'initAutocomplete', 'fetchHelpingHands', 'fetchProviders', 'getUsersRequest', 'confirmProvideRequest']);
         this.autocomplete = null;
     }
 
@@ -117,7 +118,7 @@ class SubComponent extends React.Component {
     selectedArea(val) {
         this.setState({selectedArea: val});
         if(this.state.showScreen === 'helpinghand') {
-            this.fetchProviders();
+            // this.fetchProviders();
         }
     }
 
@@ -169,6 +170,27 @@ class SubComponent extends React.Component {
         }
     }
 
+    fetchHelpingHands() {
+        const {selectedCountry, selectedState, selectedCity, selectedArea} = this.state;
+        // if(!mockOTP[mobileNo] || mockOTP[mobileNo] != this.state.otp) {
+        //     form.setFields({['otp']: {value: this.state.otp, errors: [new Error('Invalid OTP')]}});
+        //     form.validateFields('otp');
+        //     return;
+        // }
+
+        if(!(selectedCountry && selectedState && selectedCity && selectedArea)) {
+            this.props.form.validateFields(['country', 'state', 'city', 'area']);
+            return;
+        }
+        const rest = {
+            country: selectedCountry,
+            state: selectedState,
+            city: selectedCity,
+            areaName: selectedArea
+        };
+        this.props.fetchHelpingHands(rest);
+    }
+
     fetchProviders() {
         const {form} = this.props;
         const {selectedCountry, selectedState, selectedCity, selectedArea, mobileNo} = this.state;
@@ -182,15 +204,14 @@ class SubComponent extends React.Component {
             country: selectedCountry,
             state: selectedState,
             city: selectedCity,
-            areaName: selectedArea,
-            mobileNo
+            areaName: selectedArea
         };
         this.props.fetchProviders(rest);
     }
 
     confirmProvideRequest() {
         const {auth} = this.props;
-        this.props.confirmRequest({name: auth.user.username});
+        this.props.confirmRequest({name: auth.user.username, contactNo: this.state.mobileNo});
     }
 
     setFormItem(val, item) {
@@ -230,7 +251,7 @@ class SubComponent extends React.Component {
                 'area': locationData.selectedArea});
 
             if(this.state.selectedArea && this.state.showScreen === 'helpinghand') {
-                this.fetchProviders();
+                // this.fetchProviders();
             }
             clearTimeout(timer1);
         }, 30);
@@ -325,27 +346,28 @@ class SubComponent extends React.Component {
                                 countries[selectedCountry][selectedState][selectedCity].map((item) => <Option key={item} value={item}>{item}</Option>)}
                             </Select>
                         )}
+                        <Button className="ant-btn ant-btn-primary" onClick={this.fetchHelpingHands}>Know Helping Hand</Button>
+                    </Form.Item>
+                    <Form.Item label="Contact No">
+                        {getFieldDecorator('mobileNo', {rules: [
+                            {required: true, message: 'Contact no is required'},
+                            {
+                                required: true,
+                                type: 'regexp',
+                                pattern: new RegExp(/^([0|\+[0-9]{1,5})?([7-9][0-9]{9})$/g),
+                                message: 'Wrong format!'
+                            }]
+                        })(
+                            <Input onChange={(e) => this.setFormItem(parseInt(e.target.value, 10), 'mobileNo')} />
+                        )}
+                    </Form.Item>
+                    <Form.Item label="OTP">
+                        {getFieldDecorator('otp', {rules: [{required: true, message: 'Please enter OTP'}]})(
+                            <InputNumber onChange={(val) => this.setFormItem(val, 'otp')} />
+                        )}
                     </Form.Item>
 
                     {showScreen === 'provider' && <div>
-                        <Form.Item label="Contact No">
-                            {getFieldDecorator('mobileNo', {rules: [
-                                {required: true, message: 'Contact no is required'},
-                                {
-                                    required: true,
-                                    type: 'regexp',
-                                    pattern: new RegExp(/^([0|\+[0-9]{1,5})?([7-9][0-9]{9})$/g),
-                                    message: 'Wrong format!'
-                                }]
-                            })(
-                                <Input onChange={(e) => this.setFormItem(parseInt(e.target.value, 10), 'mobileNo')} />
-                            )}
-                        </Form.Item>
-                        <Form.Item label="OTP">
-                            {getFieldDecorator('otp', {rules: [{required: true, message: 'Please enter OTP'}]})(
-                                <InputNumber onChange={(val) => this.setFormItem(val, 'otp')} />
-                            )}
-                        </Form.Item>
                         <Form.Item name={['user', 'address']} label="Detail Address">
                             {getFieldDecorator('user_address', {rules: [{required: true, message: 'Address is required'}]})(
                                 <Input.TextArea value={this.state.address} onChange={(e) => this.setFormItem(e.target.value, 'address')} />
@@ -386,9 +408,9 @@ class SubComponent extends React.Component {
 
                 {showScreen === 'helpinghand' && <div>
                     {auth.user.username && <div>
-                        {/* <Button className="ant-btn ant-btn-primary" onClick={this.fetchProviders}>Get Donars</Button> */}
+                        <Button className="ant-btn ant-btn-primary" onClick={this.fetchProviders}>Get Donars</Button>
                         {selectedArea && <RequestTable name={auth.user.username}/>}
-                        {reqAdded.length > 0 && <Button className="ant-btn ant-btn-primary" onClick={this.confirmProvideRequest}>Confirm</Button>}
+                        {reqAdded.length > 0 && <Button className="ant-btn ant-btn-primary confirm-helping-hand-btn" onClick={this.confirmProvideRequest}>Confirm</Button>}
                     </div>}
                 </div>}
 
@@ -397,13 +419,23 @@ class SubComponent extends React.Component {
                     <InputNumber placeholder="Enter your mobile no" value={this.state.searchMob} onChange={(val) => this.setFormItem(val, 'searchMob')} />
                     {userRequests && userRequests.map((item) => <div key={item.date}>
                         {item.confirmedBy === null && <span>Awaiting confimation</span>}
-                        {item.confirmedBy !== null && <span><b>{item.confirmedBy}</b> will pickup the food</span>}
+                        {item.confirmedBy !== null && <span><b>{item.confirmedBy}</b> will pickup the food.
+                            <div>Contact No - {item.helpingHandContactNo}</div>
+                        </span>}
+                        <div>Thank you for you contribution. You are doing a noble work.</div>
                     </div>)}
+                </div>}
+
+                {showScreen === 'provider' && <div>
+                    <HelpingHandsTable name={auth.user.username}/>
                 </div>}
 
                 {this.props.loading && <Spin />}
                 {!this.props.loading && responseMessage && <h3>{responseMessage.message}</h3>}
 
+
+
+                
 
             </div>
 

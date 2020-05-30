@@ -83,7 +83,7 @@ class RequestTable extends React.Component {
                 width: '150px'
             },
             {
-                title: 'Action',
+                title: 'Pickup Action',
                 key: 'action',
                 width: '100px',
                 render: (text, record) => (

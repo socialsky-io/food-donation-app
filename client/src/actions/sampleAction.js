@@ -26,6 +26,10 @@ export function fetchProviders(data) {
     return {type: actions.FETCH_PROVIDER_REQUEST, payload: data};
 }
 
+export function fetchHelpingHands(data) {
+    return {type: actions.FETCH_HELPING_HANDS, payload: data};
+}
+
 export function confirmRequest(data) {
     return {type: actions.CONFIRM_REQUEST, payload: data};
 }
@@ -46,6 +50,11 @@ export function confirmRequestSuccessful(data) {
 export function getUserStatusSuccessful(data) {
     return {type: `${actions.GET_USERS_REQUEST}${actions.API_SUFFIX.SUCCESS}`, payload: data};
 }
+
+export function getHelpingHandsSuccessful(data) {
+    return {type: `${actions.FETCH_HELPING_HANDS}${actions.API_SUFFIX.SUCCESS}`, payload: data};
+}
+
 
 export function requestFailed(payload) {
     return {type: actions.REQUEST_FAILED, payload: payload};
