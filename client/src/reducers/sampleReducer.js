@@ -1,19 +1,23 @@
 
 
 
-import {CREATE_PROVIDER_REQUEST, FETCH_PROVIDER_REQUEST, API_SUFFIX, GET_USERS_REQUEST, FETCH_HELPING_HANDS,
-    REMOVE_REQUEST, ADD_REQUEST, CONFIRM_REQUEST, CLEAR_RESPONSE_MESSAGE} from '../actions/actionTypes';
+import {CREATE_DONATION_REQUEST, FETCH_DONATION_REQUEST, API_SUFFIX, GET_DONARS_REQUEST_STATUS, FETCH_HELPING_HANDS,
+    RAISE_NEED_REQUEST, FETCH_NEEDS,
+    REMOVE_REQUEST, ADD_REQUEST, CONFIRM_REQUEST, CLEAR_RESPONSE_MESSAGE, FETCH_DONARS} from '../actions/actionTypes';
 
 const {SUCCESS} = API_SUFFIX;
 
 export default function sampleReducer(initialState = {}) {
     return (state = initialState, action) => {
         switch (action.type) {
-            case CREATE_PROVIDER_REQUEST:
-            case FETCH_PROVIDER_REQUEST:
-            case GET_USERS_REQUEST:
+            case CREATE_DONATION_REQUEST:
+            case FETCH_DONATION_REQUEST:
+            case GET_DONARS_REQUEST_STATUS:
             case FETCH_HELPING_HANDS:
             case CONFIRM_REQUEST:
+            case RAISE_NEED_REQUEST:
+            case FETCH_NEEDS:
+            case FETCH_DONARS:
                 return {
                     ...state,
                     loading:true
@@ -23,10 +27,14 @@ export default function sampleReducer(initialState = {}) {
                     ...state,
                     responseMessage: {},
                     areawiseHelpingHands: [],
-                    helpingHandResponse: {}
+                    areawiseDonars: [],
+                    helpingHandResponse: {},
+                    donarsResponse: {},
+                    reqAdded: [],
+                    reqRemoved: []
                 };
             }
-            case `${GET_USERS_REQUEST}${SUCCESS}`:
+            case `${GET_DONARS_REQUEST_STATUS}${SUCCESS}`:
                 var userRequests = action.payload;
                 var responseMessage = {};
                 if(action.payload.message) {
@@ -44,7 +52,8 @@ export default function sampleReducer(initialState = {}) {
                     }),
                     responseMessage
                 });
-            case `${CREATE_PROVIDER_REQUEST}${SUCCESS}`:
+            case `${RAISE_NEED_REQUEST}${SUCCESS}`:
+            case `${CREATE_DONATION_REQUEST}${SUCCESS}`:
                 return Object.assign({}, {
                     ...state,
                     loading: false,
@@ -55,9 +64,10 @@ export default function sampleReducer(initialState = {}) {
                     ...state,
                     loading: false,
                     responseMessage: action.payload,
-                    reqAdded: []
+                    reqAdded: [],
+                    reqRemoved: []
                 });
-            case `${FETCH_PROVIDER_REQUEST}${SUCCESS}`: {
+            case `${FETCH_DONATION_REQUEST}${SUCCESS}`: {
                 let allProviders = [];
                 let responseMessage = {};
                 // let helpingHands = [];
@@ -72,6 +82,28 @@ export default function sampleReducer(initialState = {}) {
                     loading: false,
                     // helpingHands: helpingHands,
                     allProviders: allProviders.map((data, index) => {
+                        return {
+                            key: data.key || index,
+                            ...data
+                        };
+                    }),
+                    responseMessage
+                });
+            }
+
+            case `${FETCH_NEEDS}${SUCCESS}`: {
+                let allNeeds = [];
+                let responseMessage = {};
+                // let helpingHands = [];
+                if(action.payload.message) {
+                    responseMessage = action.payload;
+                } else {
+                    allNeeds = action.payload;
+                }
+                return Object.assign({}, {
+                    ...state,
+                    loading: false,
+                    allNeeds: allNeeds.map((data, index) => {
                         return {
                             key: data.key || index,
                             ...data
@@ -101,11 +133,41 @@ export default function sampleReducer(initialState = {}) {
                     helpingHandResponse
                 });
             }
+            case `${FETCH_DONARS}${SUCCESS}`: {
+                let areawiseDonars = [];
+                let donarsResponse = {};
+                if(action.payload.message) {
+                    donarsResponse = action.payload;
+                } else {
+                    areawiseDonars = action.payload;
+                }
+                return Object.assign({}, {
+                    ...state,
+                    loading: false,
+                    areawiseDonars: areawiseDonars.map((data, index) => {
+                        return {
+                            key: data.key || index,
+                            ...data
+                        };
+                    }),
+                    donarsResponse
+                });
+            }
             case ADD_REQUEST: {
                 const newAdded = [...state.reqAdded];
-                const confirmedLocalData = state.allProviders.map((item, index) => {
+                let newRemoved = [...state.reqRemoved]
+                const confirmedLocalData = state[action.payload.tableName].map((item, index) => {
                     if(item.key === action.payload.key) {
-                        newAdded.push(item._id);
+                        let itemFound = false;
+                        newRemoved = newRemoved.filter((item1) => {
+                            if(item1 === item._id) {
+                                itemFound = true;
+                            }
+                            return item1 !== item._id;
+                        });
+                        if(!itemFound) {
+                            newAdded.push(item._id);
+                        }
                         return {...item, confirmedBy: action.payload.name};
                     }
                     return item;
@@ -113,23 +175,36 @@ export default function sampleReducer(initialState = {}) {
 
                 return Object.assign({}, {
                     ...state,
-                    allProviders: confirmedLocalData,
-                    reqAdded: newAdded
+                    [action.payload.tableName]: confirmedLocalData,
+                    reqAdded: newAdded,
+                    reqRemoved: newRemoved
                 });
             }
             case REMOVE_REQUEST: {
-                let reqAdded= [...state.reqAdded];
-                const updatedData = state.allProviders.map((item, index) => {
+                let newAdded = [...state.reqAdded];
+                const newRemoved= [...state.reqRemoved];
+                const updatedData = state[action.payload.tableName].map((item, index) => {
                     if(item.key === action.payload.key) {
-                        reqAdded = reqAdded.filter((item1) => item1 !== item._id);
+                        let itemFound = false;
+                        newAdded = newAdded.filter((item1) => {
+                            if(item1 === item._id) {
+                                itemFound = true;
+                            }
+                            return item1 !== item._id;
+                        });
+                        if(!itemFound) {
+                            newRemoved.push(item._id);
+                        }
                         return {...item, confirmedBy: null};
+
                     }
                     return item;
                 });
                 return Object.assign({}, {
                     ...state,
-                    allProviders: updatedData,
-                    reqAdded: reqAdded
+                    [action.payload.tableName]: updatedData,
+                    reqRemoved: newRemoved,
+                    reqAdded: newAdded
                 });
             }
             default:

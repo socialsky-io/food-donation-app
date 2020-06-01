@@ -1,6 +1,6 @@
 import React, {Component} from 'react';
 import {BrowserRouter as Router, Route, Switch} from 'react-router-dom';
-import SubComponent from './components/subComponent/subComponent.Connect';
+import AppComponent from './components/appComponents/appComponent.Connect';
 
 import Navbar from './components/Navbar';
 import LogIn from './components/auth/LogIn';
@@ -83,14 +83,14 @@ class App extends Component {
                         <React.Fragment>
                             <Navbar auth={authProps} themeChange={this.themeChange} themetype={this.state.darkTheme} />
                             <Switch>
-                                <Route exact path="/" render={(props) => <SubComponent {...props} auth={authProps} />} />
+                                <Route exact path="/" render={(props) => <AppComponent {...props} auth={authProps} />} />
                                 <Route exact path="/login" render={(props) => <LogIn {...props} auth={authProps} />} />
                                 <Route exact path="/register" render={(props) => <Register {...props} auth={authProps} />} />
                                 <Route exact path="/forgotpassword" render={(props) => <ForgotPassword {...props} auth={authProps} />} />
                                 <Route exact path="/forgotpasswordverification" render={(props) => <ForgotPasswordVerification {...props} auth={authProps} />} />
                                 <Route exact path="/changepassword" render={(props) => <ChangePassword {...props} auth={authProps} />}/>
                                 <Route exact path="/changepasswordconfirmation" render={(props) => <ChangePasswordConfirm {...props} auth={authProps} />} />
-                                <Route exact path="/app" render={(props) => <SubComponent {...props} auth={authProps} />} />
+                                <Route exact path="/app" render={(props) => <AppComponent {...props} auth={authProps} />} />
                                 <Route exact path="/guestLogin" render={(props) => <GuestUser {...props} auth={authProps} />} />
                                 <Route exact path="/aboutUs" render={(props) => <AboutUs {...props} auth={authProps} />} />
                             </Switch>

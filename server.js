@@ -18,7 +18,8 @@ var saveGameState = require('./utils/saveGameState');
 
 
 var {fetchUsersData, createProvideRequest, getDataByArea, fetchReisteredHelpingHand,
-   registerHelpingHand, confirmProvideRequest, fetchUserStatus} = cardUtils;
+   registerHelpingHand, confirmProvideRequest, fetchUserStatus,
+   registerDonar, createNeedRequest, fetchNeeds, fetchReisteredDonars} = cardUtils;
 
 saveGameState()
 
@@ -48,9 +49,21 @@ app.post('/api/createProvideRequest', async function(req, res) {
    res.status(200).send({message: 'Good Work!! We have registered your help. Awaiting confirmation from helping hand.'})
 })
 
+app.post('/api/createNeedRequest', async function(req, res) {
+   const newProviderData = await createNeedRequest(req.body);
+   res.status(200).send({message: 'Good Work!! We have registered your need. Awaiting confirmation from donar.'})
+})
+
+
+
 app.post('/api/registerHelpingHand', async function(req, res) {
    const registeredHelper = await registerHelpingHand(req.body);
-   res.status(200).send({message: 'You are registered helping hand in this area'})
+   res.status(200).send({message: 'You are now registered helping hand in this area'})
+})
+
+app.post('/api/registerDonar', async function(req, res) {
+   const registeredHelper = await registerDonar(req.body);
+   res.status(200).send({message: 'You are now registered donar in this area'})
 })
 
 
@@ -65,13 +78,34 @@ app.get('/api/fetchProviders', async function (req, res) {
 });
 
 
+app.get('/api/fetchNeeds', async function (req, res) {
+   const areaData = await getDataByArea(req.query); 
+   if(!areaData || areaData.area === null) {
+      res.status(200).send({message: 'No Need Request around this place'});
+   } else {
+      const allNeeds = await fetchNeeds(areaData);
+      res.status(200).send(allNeeds);
+   }
+});
+
+
 app.get('/api/fetchHelpingHand', async function (req, res) {
    const areaData = await getDataByArea(req.query); 
    if(!areaData || areaData.area === null) {
-      res.status(200).send({message: 'No Helping hand available to serve this area'});
+      res.status(200).send({message: 'No Registered Helping hand serve this area'});
    } else {
       const helpingHands = await fetchReisteredHelpingHand(areaData);
       res.status(200).send(helpingHands);
+   }
+});
+
+app.get('/api/fetchDonars', async function (req, res) {
+   const areaData = await getDataByArea(req.query); 
+   if(!areaData || areaData.area === null) {
+      res.status(200).send({message: 'No Registered Donars serve this area'});
+   } else {
+      const allRegisteredDonars = await fetchReisteredDonars(areaData);
+      res.status(200).send(allRegisteredDonars);
    }
 });
 
@@ -81,6 +115,12 @@ app.post('/api/confirmProvideRequest', async function(req, res) {
    const newProviderData = await confirmProvideRequest(req.body);
    res.status(200).send(newProviderData)
 })
+
+app.post('/api/confirmNeedRequest', async function(req, res) {
+   const newProviderData = await confirmProvideRequest(req.body);
+   res.status(200).send(newProviderData)
+})
+
 
 app.get('/api/fetchUserStatus', async function(req, res) {
    let usersData = await fetchUserStatus(req.query);

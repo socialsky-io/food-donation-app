@@ -21,6 +21,23 @@ var mongoose = require('mongoose'),
     var ProviderSchema = mongoose.model("ProviderSchema", providerRequestSchema);
 
 
+    const NeedSchema = mongoose.Schema({
+        // _id: mongoose.Schema.Types.ObjectId,
+        date: Date,
+        status: String,
+        confirmedBy: String,
+        serves: Number,
+        donarsContactNo: Number,
+        helpingHandName: String,
+        purpose: String,
+        mobileNo: Number,
+        serveAs: String
+     });
+    
+    var NeedRequestSchema = mongoose.model("NeedRequestSchema", NeedSchema);
+
+
+
     const registeredHelpingHandSchema = mongoose.Schema({
         // _id: mongoose.Schema.Types.ObjectId,
         availableTimeSlot: String,
@@ -33,18 +50,25 @@ var mongoose = require('mongoose'),
     
     var HelpingHandRegisterSchema = mongoose.model("RegisteredHelpingHand", registeredHelpingHandSchema);
 
-     
-    // var providerRequestsSchema = mongoose.Schema({
-    //     providerToken: [ProviderSchema]
-    // });
+    const donarSchemaReg = mongoose.Schema({
+        availableTimeSlot: String,
+        workingDays: String,
+        donarsContactNo: Number,
+        serviceableArea: String,
+        name: String
+     });
     
-    // var ProviderRequests = mongoose.model("ProviderRequest", providerRequestsSchema);
+    var DonarRegisterSchema = mongoose.model("DonarRegisterSchema", donarSchemaReg);
+
 
     var areasSchema = mongoose.Schema({
         name:   { type: String },
         providers: [ { type: ObjectId, ref: ProviderSchema } ],
-        helpingHandRegistered: [ { type: ObjectId, ref: HelpingHandRegisterSchema } ]
+        helpingHandRegistered: [ { type: ObjectId, ref: HelpingHandRegisterSchema } ],
+        registeredDonars: [{ type: ObjectId, ref: DonarRegisterSchema }],
+        raisedNeeds: [{ type: ObjectId, ref: NeedRequestSchema }]
     });
+    
     var Areas = mongoose.model('Areas', areasSchema);
 
 
@@ -77,5 +101,7 @@ module.exports = {
     City,
     Areas,
     ProviderSchema,
-    HelpingHandRegisterSchema
+    HelpingHandRegisterSchema,
+    DonarRegisterSchema,
+    NeedRequestSchema
 }

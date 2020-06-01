@@ -1,6 +1,7 @@
 const sampleReducerInitState = {
     allProviders: [],
     reqAdded: [],
+    reqRemoved: [],
     userRequests: []
 };
 
