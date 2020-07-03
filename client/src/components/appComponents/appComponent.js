@@ -1,18 +1,17 @@
 import React from 'react';
 import {Form, Button, InputNumber, Spin} from 'antd';
+import {NavLink} from 'react-router-dom';
 import PropTypes from 'prop-types';
 import {bindAll} from 'lodash';
-import classnames from 'classnames';
 
-import RaiseNeedView from './subViews/RaiseNeedView';
-import DonarView from './subViews/DonarComponent';
-import HelpingHandView from './subViews/HelpingHandView';
-import NeedAround from './subViews/NeedAround';
+import HelpingHandComponent from './subComponents/HelpingHandComponent.Connect';
+import DonarComponent from './subComponents/DonarsComponent.Connect';
+
+import {createButtonClass} from '../../utils';
 
 const mockOTP = {
     '7588646483': '1234'
 };
-
 
 class AppComponent extends React.Component {
     constructor(props) {
@@ -30,10 +29,7 @@ class AppComponent extends React.Component {
             showScreen: '',
             searchMob: null
         };
-        bindAll(this, ['createProvider', 'checkIfErrors', 'selectedArea', 'geolocate', 'createButtonClass',
-            'changeScreen', 'initAutocomplete', 'setFormItem', 'fetchHelpingHands', 'raiseNeed',
-            'fetchProviders', 'fetchDonars', 'fetchNeeds', 'getUsersRequest', 'createLocationPayload', 
-            'confirmProvideRequest', 'confirmNeedRequest']);
+        bindAll(this, ['geolocate', 'createButtonClass', 'changeScreen', 'initAutocomplete']);
         this.autocomplete = null;
     }
 
@@ -85,173 +81,13 @@ class AppComponent extends React.Component {
         }
     }
 
-    checkIfErrors(errorInfo = []) {
-        let hasError = false;
-        const fieldKeys = Object.keys(errorInfo);
-        const totalFields = fieldKeys.length;
-        for (let index = 0; index < totalFields; index++) {
-            if (errorInfo[fieldKeys[index]]) {
-                hasError = true;
-                break;
-            }
-        }
-        return hasError;
-    }
-
-    selectedArea(val) {
-        this.setState({selectedArea: val});
-        if(this.state.showScreen === 'helpinghand') {
-            // this.fetchProviders();
-        }
-    }
-
-    getUsersRequest() {
-        const {searchMob} = this.state;
-        if(searchMob) {
-            this.props.getUserStatus({data: searchMob});
-        }
-    }
-
-    createProvider() {
-        const {form} = this.props;
-        let {...rest} = this.state;
-
-        const errors = form.validateFields();
-
-        // if(!mockOTP[rest.mobileNo] || mockOTP[rest.mobileNo] != this.state.otp) {
-        //     form.setFields({['otp']: {value: this.state.otp, errors: [new Error('Invalid OTP')]}});
-        //     form.validateFields('otp');
-        //     return;
-        // }
-        const errorInfo = form.getFieldsError();
-        if(this.checkIfErrors(errorInfo)) {
-            return;
-        }
-
-        rest.serveOn = rest.serveOn._d.toDateString();
-        const {auth} = this.props;
-        const data = {
-            date: rest.serveOn,
-            serves: rest.serves,
-            description: rest.foodDesc,
-            serveAs: rest.serveAs,
-            providerName: auth.user.username,
-            providerAddress: rest.address,
-            areaName: rest.selectedArea,
-            city: rest.selectedCity,
-            state: rest.selectedState,
-            mobileNo: rest.mobileNo,
-            country: rest.selectedCountry
-        };
-
-        if(auth.user.pool) {
-            localStorage.setItem(`${auth.user.pool.clientId}`, `${rest.selectedCountry}_${rest.selectedState}_${rest.selectedCity}_${rest.selectedArea}`);
-        }
-        this.props.createProvider(data);
-    }
-
-    raiseNeed() {
-        const {form} = this.props;
-        let {...rest} = this.state;
-
-        const errors = form.validateFields();
-
-        // if(!mockOTP[rest.mobileNo] || mockOTP[rest.mobileNo] != this.state.otp) {
-        //     form.setFields({['otp']: {value: this.state.otp, errors: [new Error('Invalid OTP')]}});
-        //     form.validateFields('otp');
-        //     return;
-        // }
-        const errorInfo = form.getFieldsError();
-        if(this.checkIfErrors(errorInfo)) {
-            return;
-        }
-
-        rest.serveOn = rest.serveOn._d.toDateString();
-        const {auth} = this.props;
-        const data = {
-            date: rest.serveOn,
-            serves: rest.serves,
-            purpose: rest.purpose,
-            serveAs: rest.serveAs,
-            helpingHandName: auth.user.username,
-            areaName: rest.selectedArea,
-            city: rest.selectedCity,
-            state: rest.selectedState,
-            country: rest.selectedCountry,
-            mobileNo: rest.mobileNo
-        };
-
-        if(auth.user.pool) {
-            localStorage.setItem(`${auth.user.pool.clientId}`, `${rest.selectedCountry}_${rest.selectedState}_${rest.selectedCity}_${rest.selectedArea}`);
-        }
-        this.props.raiseNeed(data);
-    }
-
-    createLocationPayload(){
-        const {form} = this.props;
-        const {selectedCountry, selectedState, selectedCity, selectedArea, mobileNo} = this.state;
-
-        // if(!mockOTP[mobileNo] || mockOTP[mobileNo] != this.state.otp) {
-        //     form.setFields({['otp']: {value: this.state.otp, errors: [new Error('Invalid OTP')]}});
-        //     form.validateFields('otp');
-        //     return;
-        // }
-        if(!(selectedCountry && selectedState && selectedCity && selectedArea)) {
-            this.props.form.validateFields(['country', 'state', 'city', 'area']);
-            return;
-        }
-        const rest = {
-            country: selectedCountry,
-            state: selectedState,
-            city: selectedCity,
-            areaName: selectedArea
-        };
-        return rest;
-    }
-
-    fetchHelpingHands() {
-        const payload = this.createLocationPayload();
-        this.props.fetchHelpingHands(payload);
-    }
-
-    fetchDonars() {
-        const payload = this.createLocationPayload();
-        this.props.fetchDonars(payload);
-    }
-
-    fetchProviders() {
-        const payload = this.createLocationPayload();
-        this.props.fetchProviders(payload);
-    }
-
-    fetchNeeds() {
-        const payload = this.createLocationPayload();
-        this.props.fetchNeeds(payload);
-    }
-
-    confirmProvideRequest() {
-        const {auth} = this.props;
-        this.props.confirmRequest({name: auth.user.username, contactNo: this.state.mobileNo});
-    }
-
-    confirmNeedRequest() {
-        const {auth} = this.props;
-        this.props.confirmNeedRequest({name: auth.user.username, contactNo: this.state.mobileNo});
-    }
-
-    setFormItem(val, item) {
-        this.setState({[item]: val});
-    }
-
     changeScreen(screenName) {
 
         const {auth} = this.props;
-        const {selectedCountry} = this.state;
         const {isAuthenticated, user = {}} = auth;
         if(!(user && isAuthenticated)) {
             this.props.history.push('/login');
         }
-
 
         let locationData = {selectedCountry: '', selectedState: '', selectedCity: '', selectedArea: ''};
         /******* If past user get his location data *******/
@@ -285,10 +121,7 @@ class AppComponent extends React.Component {
 
     createButtonClass(type) {
         const {showScreen} = this.state;
-        return classnames({
-            'ant-btn ant-btn-link custom-links': true,
-            'active': showScreen === type
-        });
+        return createButtonClass(type, showScreen);
     }
 
     render() {
@@ -299,40 +132,34 @@ class AppComponent extends React.Component {
         const addressComps = autocomplete.getPlace && autocomplete.getPlace().address_components;
         const {isAuthenticated, user = {}} = auth;
 
-
-        // const {selectedCountry, selectedState, selectedCity, selectedArea} = this.state;
-
-        
         const commonProps = {
             ...this.props,
             ...this.state,
             getFieldDecorator,
             isAuthenticated,
-            user
+            user,
+            showScreen
         };
 
         return (
-
             <div className="container">
+                {!this.props.flow && <p className="control landing-page-btns">
+                    <NavLink to="/app/donar">
+                        <Button type="button" className="ant-btn ant-btn ant-btn-link custom-links" >I want to donate</Button>
+                    </NavLink>
+                    <NavLink to="/app/helpinghand">
+                        <Button type="button" className="ant-btn ant-btn ant-btn-link custom-links" >Helping Hand</Button>
+                    </NavLink>
+                </p>}
+                {this.props.flow === 'donar' && <DonarComponent
+                    changeScreen={this.changeScreen}
+                    createButtonClass={this.createButtonClass}
+                    commonProps={commonProps} />}
+                {this.props.flow === 'helpinghand' && <HelpingHandComponent
+                    changeScreen={this.changeScreen}
+                    createButtonClass={this.createButtonClass}
+                    commonProps={commonProps} />}
 
-                <div className="section-category">
-                    <div className="section-title" onClick={this.create}>Donate Food</div>
-                    <div>
-                        <Button className={this.createButtonClass('provider')} onClick={() => this.changeScreen('provider')}>Donate</Button>
-                        <Button className={this.createButtonClass('needAround')} onClick={() => this.changeScreen('needAround')}>Search Need</Button>
-                        <Button className={this.createButtonClass('searchStatus')} onClick={() => this.changeScreen('searchStatus')}>Track Status</Button>
-                        {/* <Button disabled className={this.createButtonClass('x')} onClick={() => this.changeScreen('registerDonar')}>Register as Donar</Button> */}
-                    </div>
-                </div>
-                <div className="section-category">
-                    <div className="section-title">Helping Hands</div>
-                    <div>
-                        <Button className={this.createButtonClass('raiseNeed')} onClick={() => this.changeScreen('raiseNeed')}>Raise Need</Button>
-                        <Button className={this.createButtonClass('helpinghand')} onClick={() => this.changeScreen('helpinghand')}>Looking food</Button>
-                        <Button className={this.createButtonClass('searchStatusHH')} onClick={() => this.changeScreen('searchStatusHH')}>Track Status</Button>
-                        {/* <Button disabled className={this.createButtonClass('y')} onClick={() => this.changeScreen('registerHH')}>Register as Helping Hand</Button> */}
-                    </div>
-                </div>
                 {/* <div>{ad.text}</div>
                     <div id="locationField">
                         <input id="autocomplete"
@@ -348,42 +175,6 @@ class AppComponent extends React.Component {
                         return null;
                     })} */}
 
-                {showScreen === 'provider' && <DonarView
-                    {...commonProps}
-                    createProvider={this.createProvider}
-                    setFormItem={this.setFormItem}
-                    fetchHelpingHands={this.fetchHelpingHands} />}
-                {showScreen === 'helpinghand' && <HelpingHandView
-                    {...commonProps}
-                    setFormItem={this.setFormItem}
-                    fetchProviders={this.fetchProviders}
-                    confirmProvideRequest={this.confirmProvideRequest} />}
-                {showScreen === 'raiseNeed' && <RaiseNeedView
-                    {...commonProps}
-                    raiseNeed={this.raiseNeed}
-                    fetchDonars={this.fetchDonars}
-                    setFormItem={this.setFormItem} />}
-
-                {showScreen === 'needAround' && <NeedAround
-                    {...commonProps}
-                    confirmNeedRequest={this.confirmNeedRequest}
-                    setFormItem={this.setFormItem}
-                    fetchNeeds={this.fetchNeeds} />}
-
-                {showScreen === 'searchStatus' && <div className="search-status">
-                    <Button className="ant-btn ant-btn-primary" onClick={this.getUsersRequest}>Get Status</Button>
-                    <InputNumber placeholder="Enter your mobile no" value={this.state.searchMob} onChange={(val) => this.setFormItem(val, 'searchMob')} />
-                    {userRequests && userRequests.map((item) => <div key={item.date}>
-                        {item.confirmedBy === null && <span>Awaiting confimation</span>}
-                        {item.confirmedBy !== null && <span><b>{item.confirmedBy}</b> will pickup, <span>{item.description}</span>
-                            <div>Contact No - {item.helpingHandContactNo}</div>
-                        </span>}
-                        <hr />
-                    </div>)}
-                    {(userRequests && userRequests.length > 0) && <div>Thank you for you contribution. You are doing a noble work.</div>}
-                </div>}
-
-                {showScreen === 'searchStatusHH' && <div className="search-status"> Track status for Helping hand. Work under progress </div>}
 
                 {this.props.loading && <Spin />}
                 {!this.props.loading && responseMessage && <h3>{responseMessage.message}</h3>}
@@ -400,6 +191,13 @@ AppComponent.propTypes = {
     loading: PropTypes.boolean,
     userRequests: PropTypes.array,
     responseMessage: PropTypes.object
+};
+
+AppComponent.defaultProps = {
+    loading: false,
+    userRequests: [],
+    responseMessage: {},
+    flow: ''
 };
 
 const AppComponentForm = Form.create()(AppComponent);

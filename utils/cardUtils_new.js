@@ -251,7 +251,7 @@ module.exports = function () {
                 { $set: { confirmedBy : null, donarsContactNo: null } },
                 {multi: true}
             );
-            return {message: 'Request Modified! Please be available to collect'}
+            return {message: 'Request Modified! Please be ready to donate. Helping hand may contact you for the same.'}
         } catch(err) {
             return {message: 'Unable to save info', error: err}
         }

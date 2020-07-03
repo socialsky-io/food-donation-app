@@ -1,6 +1,7 @@
 import React, { Component, Fragment } from 'react'
 import {Auth} from 'aws-amplify';
 import { Switch } from 'antd';
+import { NavLink } from 'react-router-dom';
 
 export default class Navbar extends Component {
 
@@ -33,22 +34,21 @@ export default class Navbar extends Component {
                             )}
                             <div className="buttons">
                                 {isAuthenticated && user && (
-                                    <a href="/" onClick={this.handleLogout} className="button is-light log-out-btn">
+                                    <NavLink to="/" onClick={this.handleLogout} className="button is-light log-out-btn">
                                         Log out
-                                    </a>
+                                    </NavLink>
                                 )}
                                 {!isAuthenticated && !user && (
                                     <Fragment>
-
-                                        <a href="/aboutus" className="button is-light">
+                                        <NavLink to="/aboutus" className="button is-light">
                                             How it works
-                                        </a>
-                                        <a href="/register" className="button is-primary">
+                                        </NavLink>
+                                        <NavLink to="/register" className="button is-primary">
                                             Register
-                                        </a>
-                                        <a href="/login" className="button is-light">
+                                        </NavLink>
+                                        <NavLink to="/login" className="button is-light">
                                             Log in
-                                        </a>
+                                        </NavLink>
                                     </Fragment>
                                 )}                          
                             </div>

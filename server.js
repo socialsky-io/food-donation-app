@@ -18,7 +18,7 @@ var saveGameState = require('./utils/saveGameState');
 
 
 var {fetchUsersData, createProvideRequest, getDataByArea, fetchReisteredHelpingHand,
-   registerHelpingHand, confirmProvideRequest, fetchUserStatus,
+   registerHelpingHand, confirmProvideRequest, fetchUserStatus, confirmNeedRequest, 
    registerDonar, createNeedRequest, fetchNeeds, fetchReisteredDonars} = cardUtils;
 
 saveGameState()
@@ -117,8 +117,8 @@ app.post('/api/confirmProvideRequest', async function(req, res) {
 })
 
 app.post('/api/confirmNeedRequest', async function(req, res) {
-   const newProviderData = await confirmProvideRequest(req.body);
-   res.status(200).send(newProviderData)
+   const resp = await confirmNeedRequest(req.body);
+   res.status(200).send(resp)
 })
 
 

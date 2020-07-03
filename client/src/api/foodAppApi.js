@@ -3,8 +3,8 @@ import {simpleMapPipe} from './pipes.api';
 
 const http = new RxPhoenixHttp();
 
-const baseURL = 'http://localhost:8070/api';
-// const baseURL = '/api';
+// const baseURL = 'http://localhost:8070/api';
+const baseURL = '/api';
 
 const getQueryParams = (parameters) => {
     return Object.keys(parameters).map(paramKey => `${paramKey}=${parameters[paramKey]}`).join('&');

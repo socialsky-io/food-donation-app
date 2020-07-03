@@ -1,7 +1,8 @@
 import React, { Component } from 'react';
-import FormErrors from "../FormErrors";
-import Validate from "../utility/FormValidation";
+import {NavLink} from 'react-router-dom';
 import {Auth} from 'aws-amplify';
+import FormErrors from '../FormErrors';
+import Validate from '../utility/FormValidation';
 
 class ForgotPassword extends Component {
   state = {
@@ -81,7 +82,7 @@ class ForgotPassword extends Component {
                       </div>
                       <div className="field">
                           <p className="control">
-                              <a href="/forgotpassword">Forgot password?</a>
+                              <NavLink to="/forgotpassword">Forgot password?</NavLink>
                           </p>
                       </div>
                       <div className="field">

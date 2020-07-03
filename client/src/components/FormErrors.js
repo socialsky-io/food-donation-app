@@ -6,7 +6,7 @@ function FormErrors(props) {
     (props.formerrors.blankfield || props.formerrors.passwordmatch)
   ) {
     return (
-      <div className="error container help is-danger">
+      <div className="error help is-danger">
         <div className="row justify-content-center">
           {props.formerrors.passwordmatch
             ? "Password value does not match confirm password value"
@@ -19,13 +19,13 @@ function FormErrors(props) {
     );
   } else if (props.apierrors) {
     return (
-      <div className="error container help is-danger">
+      <div className="error help is-danger">
         <div className="row justify-content-center">{props.apierrors}</div>
       </div>
     );
   } else if (props.formerrors && props.formerrors.cognito) {
     return (
-      <div className="error container help is-danger">
+      <div className="error help is-danger">
         <div className="row justify-content-center">
           {props.formerrors.cognito.message}
         </div>

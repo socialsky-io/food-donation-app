@@ -1,7 +1,8 @@
 import React, { Component } from 'react';
+import {NavLink} from 'react-router-dom';
+import {Auth} from 'aws-amplify';
 import FormErrors from '../FormErrors';
 import Validate from '../utility/FormValidation';
-import {Auth} from 'aws-amplify';
 
 class Register extends Component {
 
@@ -144,7 +145,7 @@ class Register extends Component {
                       </div>
                       <div className="field">
                           <p className="control">
-                              <a href="/forgotpassword">Forgot password?</a>
+                              <NavLink to="/forgotpassword">Forgot password?</NavLink>
                           </p>
                       </div>
                       <div className="field">

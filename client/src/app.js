@@ -91,6 +91,8 @@ class App extends Component {
                                 <Route exact path="/changepassword" render={(props) => <ChangePassword {...props} auth={authProps} />}/>
                                 <Route exact path="/changepasswordconfirmation" render={(props) => <ChangePasswordConfirm {...props} auth={authProps} />} />
                                 <Route exact path="/app" render={(props) => <AppComponent {...props} auth={authProps} />} />
+                                <Route exact path="/app/donar" render={(props) => <AppComponent {...props} auth={authProps} flow={'donar'} />} />
+                                <Route exact path="/app/helpinghand" render={(props) => <AppComponent {...props} auth={authProps} flow={'helpinghand'} />} />
                                 <Route exact path="/guestLogin" render={(props) => <GuestUser {...props} auth={authProps} />} />
                                 <Route exact path="/aboutUs" render={(props) => <AboutUs {...props} auth={authProps} />} />
                             </Switch>

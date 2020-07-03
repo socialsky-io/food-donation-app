@@ -5,5 +5,4 @@
 **.vscode
 **/client/package-lock.json
 **/package-lock.json
-**/client/.eslintrc.json
 **/client/test

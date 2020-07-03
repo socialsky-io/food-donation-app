@@ -1,8 +1,9 @@
 import React, {Component} from 'react';
+import {Auth} from 'aws-amplify';
+import {NavLink} from 'react-router-dom';
+import CarouselItems from '../ImageCaruosel';
 import FormErrors from '../FormErrors';
 import Validate from '../utility/FormValidation';
-import {Auth} from 'aws-amplify';
-import CarouselItems from '../ImageCaruosel';
 
 class LogIn extends Component {
   state = {
@@ -103,7 +104,7 @@ class LogIn extends Component {
                       </div>
                       <div className="field">
                           <p className="control">
-                              <a href="/forgotpassword">Forgot password?</a>
+                              <NavLink to="/forgotpassword">Forgot password?</NavLink>
                           </p>
                       </div>
                       <div className="field">
@@ -111,9 +112,9 @@ class LogIn extends Component {
                               <button className="button is-primary">
                                 Login
                               </button>
-                              <a href="/guestLogin" className="button is-primary back-game-btn">
+                              <NavLink to="/guestLogin" className="button is-primary back-game-btn">
                                 Guest Login
-                              </a>
+                              </NavLink>
                           </p>
                       </div>
                   </form>
